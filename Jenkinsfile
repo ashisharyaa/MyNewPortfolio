@@ -10,7 +10,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'docker run --name my-portfolio -d -p 8090:80 $DOCKER_Portfolio_IMAGE'
+        sh 'docker run --name my-portfolio-app -d -p 8090:80 $DOCKER_Portfolio_IMAGE'
       }
     }
     stage('pushing image to DockerHub') {
