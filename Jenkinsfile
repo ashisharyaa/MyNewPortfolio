@@ -10,7 +10,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'docker run --name portfolio-cont-apps -d $DOCKER_Portfolio_IMAGE'
+        sh 'docker run --name portfolio-cont-app -d $DOCKER_Portfolio_IMAGE'
       }
     }
     stage('pushing image to DockerHub') {
