@@ -10,7 +10,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'docker run --name my-portfolio-app-container -d $DOCKER_Portfolio_IMAGE'
+        sh 'docker run --name my-portfolio-container-app -d $DOCKER_Portfolio_IMAGE'
       }
     }
     stage('pushing image to DockerHub') {
@@ -25,8 +25,8 @@ pipeline {
       steps {
         withCredentials([file(credentialsId: "${KUBERNETES_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
           sh '''
-            kubectl set image deployment/my-portfolio-deployment my-portfolio-container=$DOCKER_Portfolio_IMAGE --kubeconfig $KUBECONFIG
-            kubectl rollout status deployment/my-portfolio-deployment --kubeconfig $KUBECONFIG
+            kubectl set image deployment.apps/webapp-deployment my-portfolio-container=$DOCKER_Portfolio_IMAGE --kubeconfig $KUBECONFIG
+            kubectl rollout status deployment.apps/webapp-deployment --kubeconfig $KUBECONFIG
           '''
         }
       }
