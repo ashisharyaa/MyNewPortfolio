@@ -10,7 +10,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'docker run --name my-portfolio-app-cont -d -p 8070:80 $DOCKER_Portfolio_IMAGE'
+        sh 'docker run --name my-portfolio-app-container -d $DOCKER_Portfolio_IMAGE'
       }
     }
     stage('pushing image to DockerHub') {
@@ -21,10 +21,13 @@ pipeline {
         }
       }
     }
-    stage('Deploying App to Kubernetes') {
+   stage('Deploy to Kubernetes') {
       steps {
-        script {
-          kubernetesDeploy(configs: "deploymentservice.yml", kubeconfigId: "kubernetes")
+        withCredentials([file(credentialsId: "${KUBERNETES_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
+          sh '''
+            kubectl set image deployment/my-portfolio-deployment my-portfolio-container=$DOCKER_Portfolio_IMAGE --kubeconfig $KUBECONFIG
+            kubectl rollout status deployment/my-portfolio-deployment --kubeconfig $KUBECONFIG
+          '''
         }
       }
     }
