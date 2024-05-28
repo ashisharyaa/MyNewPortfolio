@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: webapp-deployment
+  namespace: portfolio
   labels:
     app: portfolio-webapp
 spec:
@@ -35,3 +36,4 @@ spec:
     port: 5000
     targetPort: 3000
     nodePort: 31110
+  type: NodePort
