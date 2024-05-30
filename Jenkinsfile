@@ -15,7 +15,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'docker run --name ${CONTAINER_NAME} -d -p 7070:80 $DOCKER_Portfolio_IMAGE:${BUILD_ID}'
+        sh 'docker run --name ${CONTAINER_NAME} -d -p 7060:80 $DOCKER_Portfolio_IMAGE:${BUILD_ID}'
       }
     }
     stage('pushing image to DockerHub') {
