@@ -10,19 +10,19 @@ pipeline {
     stage('Build') {
       steps {
         sh 'docker build -t ${DOCKER_IMAGE} .'
-        sh 'docker tag ${DOCKER_IMAGE} ${DOCKER_TAG}'
+        sh 'docker tag ${DOCKER_IMAGE}  $DOCKER_Portfolio_IMAGE:${BUILD_ID}'
       }
     }
     stage('Test') {
       steps {
-        sh 'docker run --name ${CONTAINER_NAME} -d -p 7070:80 ${DOCKER_TAG}'
+        sh 'docker run --name ${CONTAINER_NAME} -d -p 7070:80 $DOCKER_Portfolio_IMAGE:${BUILD_ID}'
       }
     }
     stage('pushing image to DockerHub') {
       steps {
         withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
           sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io"
-          sh 'docker push ${DOCKER_TAG}'
+          sh 'docker push $DOCKER_Portfolio_IMAGE:${BUILD_ID}'
         }
       }
     }
