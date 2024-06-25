@@ -15,7 +15,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'docker run --name ${CONTAINER_NAME} -d -p 7070:80 ${DOCKER_TAG}'
+        sh 'docker run --name ${CONTAINER_NAME} -d -p 6060:80 ${DOCKER_TAG}'
       }
     }
     stage('pushing image to DockerHub') {
