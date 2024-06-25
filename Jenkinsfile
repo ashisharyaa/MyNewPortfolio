@@ -4,6 +4,7 @@ pipeline {
         DOCKER_IMAGE = 'my-portfolio-web-app'
         DOCKER_TAG = "$DOCKER_Portfolio_IMAGE:${BUILD_ID}"
         CONTAINER_NAME = "portfolio-webapp-${BUILD_ID}"
+        KUBECONFIG = '/home/ashish/.kube/config'
     }
 
   stages {
