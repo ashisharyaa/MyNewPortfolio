@@ -38,6 +38,9 @@ pipeline {
    stage('Deploy to Minikube') {
             steps {
                 script {
+                  // Create kubeconfig file if it doesn't already exist
+                    sh 'mkdir -p ${env.WORKSPACE}/.kube'
+                    sh 'minikube kubectl -- config view --flatten > ${KUBECONFIG}'
 
                     // Apply the deployment and service configuration from the YAML file
                     sh "kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml"
