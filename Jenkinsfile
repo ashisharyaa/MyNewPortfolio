@@ -4,10 +4,18 @@ pipeline {
         DOCKER_IMAGE = 'my-portfolio-web-app'
         DOCKER_TAG = "$DOCKER_Portfolio_IMAGE:${BUILD_ID}"
         CONTAINER_NAME = "portfolio-webapp-${BUILD_ID}"
-        KUBECONFIG = '/home/ashish/.kube/config'
+        KUBECONFIG = "${env.WORKSPACE}/.kube/config" // Path to kubeconfig file
     }
 
   stages {
+    
+    stage('Checkout') {
+            steps {
+                // Checkout the repository containing the deploymentservice.yml file
+                git 'https://github.com/ashisharyaa/MyNewPortfolio.git' // Update with your repository URL
+            }
+        }
+
     stage('Build') {
       steps {
         sh 'docker build -t ${DOCKER_IMAGE} .'
@@ -16,7 +24,7 @@ pipeline {
     }
     stage('Test') {
       steps {
-        sh 'docker run --name ${CONTAINER_NAME} -d -p 5050:80 ${DOCKER_TAG}'
+        sh 'docker run --name ${CONTAINER_NAME} -d ${DOCKER_TAG}'
       }
     }
     stage('pushing image to DockerHub') {
@@ -27,16 +35,27 @@ pipeline {
         }
       }
     }
-   stage('Deploy to Kubernetes') {
-      steps {
-        withCredentials([file(credentialsId: "${KUBERNETES_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
-          sh '''
-            kubectl set image deployment.apps/webapp-deployment portfolio-webapp=$DOCKER_Portfolio_IMAGE:${BUILD_ID} --namespace portfolio --kubeconfig $KUBECONFIG
-            kubectl rollout status deployment.apps/webapp-deployment --namespace portfolio --kubeconfig $KUBECONFIG
-          '''
+   stage('Deploy to Minikube') {
+            steps {
+                script {
+                    // Ensure Minikube's Docker environment is set up
+                    sh 'eval $(minikube docker-env)'
+
+                    // Create kubeconfig file
+                    sh 'mkdir -p ${env.WORKSPACE}/.kube'
+                    sh 'minikube kubectl -- config view --flatten > ${KUBECONFIG}'
+
+                    // Apply the deployment and service configuration from the YAML file
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml"
+
+                    // Update the image in the existing deployment
+                    sh "kubectl --kubeconfig=${KUBECONFIG} set image deployment.apps/webapp-deployment portfolio-webapp=${DOCKER_TAG} --namespace portfolio"
+
+                    // Ensure the deployment has rolled out
+                    sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment.apps/webapp-deployment --namespace portfolio"
+                }
+            }
         }
-      }
-    }
   }
   post {
     always {
