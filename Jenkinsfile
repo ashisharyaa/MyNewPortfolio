@@ -38,9 +38,6 @@ pipeline {
    stage('Deploy to Minikube') {
             steps {
                 script {
-                    // Ensure Minikube's Docker environment is set up
-                    sh 'eval $(minikube docker-env)'
-
                     // Create kubeconfig file
                     sh 'mkdir -p ${env.WORKSPACE}/.kube'
                     sh 'minikube kubectl -- config view --flatten > ${KUBECONFIG}'
