@@ -43,7 +43,7 @@ pipeline {
                     sh "minikube kubectl -- config view --flatten > ${KUBECONFIG}"
 
                     // Apply the deployment and service configuration from the YAML file
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply --validate=false -f deploymentservice.yml"
 
                     // Update the image in the existing deployment
                     sh "kubectl --kubeconfig=${KUBECONFIG} set image deployment.apps/webapp-deployment portfolio-webapp=${DOCKER_TAG} --namespace portfolio"
