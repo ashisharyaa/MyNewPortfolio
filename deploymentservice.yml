@@ -20,7 +20,7 @@ spec:
         image: mydocker0707/webapp:latest
         ports:
         - containerPort: 3000
-        
+
 ---
 
 apiVersion: v1
@@ -31,10 +31,9 @@ metadata:
 spec:
   selector:
     app: portfolio-webapp
-  type: LoadBalancer
+  type: NodePort
   ports:
   - protocol: TCP
     port: 5000
     targetPort: 3000
     nodePort: 31110
-  type: NodePort
