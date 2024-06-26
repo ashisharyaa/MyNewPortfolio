@@ -12,7 +12,7 @@ pipeline {
     stage('Checkout') {
             steps {
                 // Checkout the repository containing the deploymentservice.yml file
-                git 'https://github.com/ashisharyaa/MyNewPortfolio.git' // Update with your repository URL
+                git branch: 'k8s_deploy_feature_branch', url: 'https://github.com/ashisharyaa/MyNewPortfolio.git' // Update with your repository URL
             }
         }
 
