@@ -18,8 +18,10 @@ pipeline {
 
     stage('Build') {
       steps {
+        container('docker') {
         sh 'docker build -t ${DOCKER_IMAGE} .'
         sh 'docker tag ${DOCKER_IMAGE} ${DOCKER_TAG}'
+        }
       }
     }
     stage('Test') {
