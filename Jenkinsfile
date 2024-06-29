@@ -37,24 +37,19 @@ pipeline {
         }
       }
     }
-   stage('Deploy to Minikube') {
-            steps {
-                script {
-                  // Create kubeconfig file if it doesn't already exist
-                    sh "mkdir -p ${env.WORKSPACE}/.kube"
-                    sh "minikube kubectl -- config view --flatten > ${KUBECONFIG}"
-
-                    // Apply the deployment and service configuration from the YAML file
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml"
-
-                    // Update the image in the existing deployment
-                    sh "kubectl --kubeconfig=${KUBECONFIG} set image deployment.apps/webapp-deployment portfolio-webapp=${DOCKER_TAG} --namespace portfolio"
-
-                    // Ensure the deployment has rolled out
-                    sh "kubectl --kubeconfig=${KUBECONFIG} rollout status deployment.apps/webapp-deployment --namespace portfolio"
-                }
-            }
+   stage('Deploy to Kubernetes') {
+      steps {
+        withCredentials([file(credentialsId: "${KUBERNETES_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
+          sh '''
+            mkdir -p ${env.WORKSPACE}/.kube
+	          minikube kubectl -- config view --flatten > ${KUBECONFIG}
+	          kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml
+            kubectl set image deployment.apps/webapp-deployment portfolio-webapp=${DOCKER_TAG} --namespace portfolio --kubeconfig $KUBECONFIG
+            kubectl rollout status deployment.apps/webapp-deployment --namespace portfolio --kubeconfig $KUBECONFIG
+          '''
         }
+      }
+    }
   }
   post {
     always {
