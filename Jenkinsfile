@@ -4,7 +4,7 @@ pipeline {
         DOCKER_IMAGE = 'my-portfolio-web-app'
         DOCKER_TAG = "$DOCKER_Portfolio_IMAGE:${BUILD_ID}"
         CONTAINER_NAME = "portfolio-webapp-${BUILD_ID}"
-        KUBECONFIG = "${env.WORKSPACE}/.kube/config" // Path to kubeconfig file
+	KUBECONFIG = "${env.WORKSPACE}/.kube/config"
     }
 
   stages {
@@ -18,12 +18,10 @@ pipeline {
 
     stage('Build') {
       steps {
-        container('docker') {
         sh 'docker build -t ${DOCKER_IMAGE} .'
         sh 'docker tag ${DOCKER_IMAGE} ${DOCKER_TAG}'
         }
       }
-    }
     stage('Test') {
       steps {
         sh 'docker run --name ${CONTAINER_NAME} -d ${DOCKER_TAG}'
@@ -42,8 +40,8 @@ pipeline {
         withCredentials([file(credentialsId: "${KUBERNETES_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
           sh '''
             mkdir -p ${env.WORKSPACE}/.kube
-	          minikube kubectl -- config view --flatten > ${KUBECONFIG}
-	          kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml
+            minikube kubectl -- config view --flatten > ${KUBECONFIG}
+	    kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml
             kubectl set image deployment.apps/webapp-deployment portfolio-webapp=${DOCKER_TAG} --namespace portfolio --kubeconfig $KUBECONFIG
             kubectl rollout status deployment.apps/webapp-deployment --namespace portfolio --kubeconfig $KUBECONFIG
           '''
