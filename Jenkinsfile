@@ -39,6 +39,7 @@ pipeline {
       steps {
         withCredentials([file(credentialsId: "${KUBERNETES_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
           sh '''
+	    minikube kubectl -- config view --flatten > ${KUBECONFIG}
 	    kubectl --kubeconfig=${KUBECONFIG} apply -f deploymentservice.yml
             kubectl set image deployment.apps/webapp-deployment portfolio-webapp=${DOCKER_TAG} --namespace portfolio --kubeconfig $KUBECONFIG
             kubectl rollout status deployment.apps/webapp-deployment --namespace portfolio --kubeconfig $KUBECONFIG
