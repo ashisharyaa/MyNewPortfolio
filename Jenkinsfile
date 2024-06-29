@@ -24,7 +24,7 @@ pipeline {
       }
     stage('Test') {
       steps {
-        sh 'docker run --no-cache --name ${CONTAINER_NAME} -d ${DOCKER_TAG}'
+        sh 'docker run --name ${CONTAINER_NAME} -d ${DOCKER_TAG}'
       }
     }
     stage('pushing image to DockerHub') {
